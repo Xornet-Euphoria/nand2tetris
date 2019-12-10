@@ -1,0 +1,6 @@
+tools
+.vscode
+*.hack
+*.tst
+*.out
+*.cmp
