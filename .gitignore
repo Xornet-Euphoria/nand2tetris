@@ -1,6 +1,12 @@
+__pycache__
 tools
 .vscode
 *.hack
 *.tst
 *.out
 *.cmp
+*.vm
+*.asm
+# 04の課題
+!fill.asm
+!mult.asm
