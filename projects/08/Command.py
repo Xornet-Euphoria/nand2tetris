@@ -36,3 +36,12 @@ class Command:
             self.command_type = CommandType.C_GOTO
         elif self.command == "if-goto":
             self.command_type = CommandType.C_IF
+        elif self.command == "function":
+            self.command_type = CommandType.C_FUNCTION
+        elif self.command == "return":
+            self.command_type = CommandType.C_RETURN
+        elif self.command == "call":
+            self.command_type = CommandType.C_CALL
+        else:
+            print("[+]: unknown command")
+            exit(1)
