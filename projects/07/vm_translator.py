@@ -1,14 +1,22 @@
+import sys
 from parser import Parser
 from CommandType import CommandType
 from CodeWriter import CodeWriter
 
 
 if __name__ == "__main__":
-    path_and_name = "StackArithmetic/StackTest/StackTest"
-    p = Parser(path_and_name + ".vm")
-    out = open(path_and_name + ".asm", "w")
+    args = sys.argv
+    if len(args) < 2:
+        print("[+]: Usage: python vm_translator.py <file_name>")
+        exit(0)
 
-    cw = CodeWriter()
+    path = args[1]
+
+    p = Parser(path)
+    out_path = path.replace(".vm", "")
+    out = open(out_path + ".asm", "w")
+
+    cw = CodeWriter(out_path.split("/")[-1])
 
     while p.remain_command:
         command = p.get_command()

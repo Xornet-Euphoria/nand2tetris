@@ -6,8 +6,8 @@ class CodeWriter:
     unary_functions = ["neg", "not"]
     label_index = 0
 
-    def __init__(self):
-        pass
+    def __init__(self, file_name):
+        self.file_name = file_name
 
 
     def write_command(self, command):
@@ -19,7 +19,7 @@ class CodeWriter:
         if com_type == CommandType.C_PUSH:
             return self.write_push(command)
         
-        if com_type == CommandType.C_PUSH:
+        if com_type == CommandType.C_POP:
             return self.write_pop(command)
 
     
@@ -99,7 +99,6 @@ class CodeWriter:
         return "\n".join(commands_str)
 
 
-
     def write_push(self, command):
         segment = command.arg1
         index = command.arg2
@@ -114,6 +113,45 @@ class CodeWriter:
         if segment == "constant":
             commands_str.append("@{}".format(index))
             commands_str.append("D=A")
+        elif segment == "local":
+            commands_str.append("@LCL")
+            commands_str.append("D=M")
+            commands_str.append("@{}".format(index))
+            commands_str.append("A=D+A")
+            commands_str.append("D=M")
+        elif segment == "argument":
+            commands_str.append("@ARG")
+            commands_str.append("D=M")
+            commands_str.append("@{}".format(index))
+            commands_str.append("A=D+A")
+            commands_str.append("D=M")
+        elif segment == "this":
+            commands_str.append("@THIS")
+            commands_str.append("D=M")
+            commands_str.append("@{}".format(index))
+            commands_str.append("A=D+A")
+            commands_str.append("D=M")
+        elif segment == "that":
+            commands_str.append("@THAT")
+            commands_str.append("D=M")
+            commands_str.append("@{}".format(index))
+            commands_str.append("A=D+A")
+            commands_str.append("D=M")
+        elif segment == "pointer":
+            commands_str.append("@3")
+            commands_str.append("D=A")
+            commands_str.append("@{}".format(index))
+            commands_str.append("A=D+A")
+            commands_str.append("D=M")
+        elif segment == "temp":
+            commands_str.append("@5")
+            commands_str.append("D=A")
+            commands_str.append("@{}".format(index))
+            commands_str.append("A=D+A")
+            commands_str.append("D=M")
+        elif segment == "static":
+            commands_str.append("@{}.{}".format(self.file_name, index))
+            commands_str.append("D=M")
 
         # スタックへ格納
         commands_str.append("@SP")
@@ -128,4 +166,55 @@ class CodeWriter:
 
 
     def write_pop(self, command):
-        pass
+        segment = command.arg1
+        index = command.arg2
+
+        if segment is None or index is None:
+            # todo: error handling
+            print("[+]: argment error")
+            exit(1)
+        
+        commands_str = []
+
+        # target addrをR13レジスタへ格納
+        if segment == "static":
+            commands_str.append("@{}.{}".format(self.file_name, index))
+            commands_str.append("D=A")
+        else:
+            if segment == "local":
+                commands_str.append("@LCL")
+                commands_str.append("D=M")
+            elif segment == "argument":
+                commands_str.append("@ARG")
+                commands_str.append("D=M")
+            elif segment == "this":
+                commands_str.append("@THIS")
+                commands_str.append("D=M")
+            elif segment == "that":
+                commands_str.append("@THAT")
+                commands_str.append("D=M")
+            elif segment == "pointer":
+                commands_str.append("@3")
+                commands_str.append("D=A")
+            elif segment == "temp":
+                commands_str.append("@5")
+                commands_str.append("D=A")
+
+            commands_str.append("@{}".format(index))
+            commands_str.append("D=D+A")
+
+        commands_str.append("@R13")
+        commands_str.append("M=D")
+        
+        # Dレジスタにスタックトップを格納
+        commands_str.append("@SP")
+        commands_str.append("M=M-1")
+        commands_str.append("A=M")
+        commands_str.append("D=M")
+
+        # R13レジスタ中のアドレスへDの値を格納
+        commands_str.append("@R13")
+        commands_str.append("A=M")
+        commands_str.append("M=D")
+
+        return "\n".join(commands_str)
