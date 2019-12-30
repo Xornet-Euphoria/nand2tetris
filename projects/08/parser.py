@@ -1,11 +1,11 @@
 from Command import Command
 
 class Parser:
-    command_list = []
-    remain_command = True
-    current_index = 0
-    
     def __init__(self, file_path):
+        self.command_list = []
+        self.remain_command = True
+        self.current_index = 0
+        
         # read file
         with open(file_path) as f:
             raw_command_list = f.readlines()

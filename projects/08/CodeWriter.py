@@ -392,7 +392,7 @@ class CodeWriter:
         commands_str = []
 
         # return addr
-        commands_str.append("@ret.{}".format(f_name))
+        commands_str.append("@ret.{}.{}.{}".format(f_name, self.file_name, self.label_index))
         commands_str.append("D=A")
         commands_str.append("@SP")
         commands_str.append("A=M")
@@ -452,6 +452,8 @@ class CodeWriter:
         commands_str.append("@{}".format(f_name))
         commands_str.append("0;JMP")
         
-        commands_str.append("(ret.{})".format(f_name))
+        commands_str.append("(ret.{}.{}.{})".format(f_name, self.file_name, self.label_index))
+
+        self.label_index += 1
 
         return "\n".join(commands_str)
